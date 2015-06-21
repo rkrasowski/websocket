@@ -17,12 +17,17 @@ websocket '/echo' => sub {
   # Increase inactivity timeout for connection a bit
   $c->inactivity_timeout(300);
 
-  # Incoming message
-  $c->on(message => sub {
-    my ($c, $msg1) = @_;
-$msg1 = `date`;
-    $c->send("echo: $msg1");
-  });
+  # Message
+
+ # $c->on(message => sub {
+#	my $msg1;
+ #      ($c, $msg1) = @_;
+#	$msg1 = `date`;
+
+	my $msg1 = `date`;
+    	$c->send($msg1);
+
+#  });
 
   # Closed
   $c->on(finish => sub {
@@ -32,23 +37,22 @@ $msg1 = `date`;
 };
 
 app->start;
+
+
 __DATA__
 
 @@ index.html.ep
 <!DOCTYPE html>
 <html>
-  <head><title>Echo</title></head>
+  <head><title>Test</title></head>
   <body>
     <script>
       var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
-
-      // Incoming messages
       ws.onmessage = function(event) {
-        document.body.innerHTML += event.data + '<br/>';
+	document.getElementById("dateTime").innerHTML = event.data;
       };
-
-      // Outgoing messages
-      window.setInterval(function () { ws.send('Hello Mojo!') }, 1000);
     </script>
+
+<h1 id="dateTime"></h1>
   </body>
 </html>
