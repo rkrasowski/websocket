@@ -18,13 +18,11 @@ websocket '/echo' => sub {
 
  });
 
-
-
    $c->on(finish => sub {
     my ($c, $code, $reason) = @_;
+    $c->on(finish => sub { Mojo::IOLoop->remove($id) });
 
     $c->app->log->debug("WebSocket closed with status $code");
-	 $c->on(finish => sub { Mojo::IOLoop->remove($id) });
 
   });
 };
