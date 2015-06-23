@@ -8,6 +8,10 @@ use Mojo::JSON qw(decode_json encode_json);
 my $minimum = 1000;
 my $maximum = 9999;
 
+my $minimumSpd = 0;
+my $maximumSpd = 15;
+
+
 
 get '/' => 'index';
 
@@ -21,9 +25,9 @@ websocket '/echo' => sub {
 
 my $lat = $minimum + int(rand($maximum - $minimum));
 my $lon = $minimum + int(rand($maximum - $minimum));
-my $text = $minimum + int(rand($maximum - $minimum));
+my $speed = $minimumSpd + int(rand($maximumSpd - $minimumSpd));
 
-my $bytes = encode_json {lat => $lat, lon => $lon, text => $text};
+my $bytes = encode_json {lat => $lat, lon => $lon, speed => $speed};
 $ws->send($bytes);
  
  });
@@ -51,8 +55,31 @@ table, th, td {
     border-collapse: collapse;
 }
 th, td {
-    padding: 10px;
+    padding: 5px;
+    padding-top:1px;
+    padding-bottum: 2px;
 }
+
+
+.lable{
+ background-color: #E5C9A4;
+}
+
+.pos{
+  background-color: #EDDDC8;
+}
+
+
+
+table {
+ float:left;
+ width:200px;
+ border-width:5px;   
+ border-style:ridge;
+}
+
+
+
 </style>
 
 </head>
@@ -62,34 +89,31 @@ th, td {
  	var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
  	ws.onmessage = function(event) {
 		var res = JSON.parse(event.data);
-		document.getElementById("TabLat").innerHTML = res.lat;
-		document.getElementById("TabLon").innerHTML = res.lon;
-		document.getElementById("TabText").innerHTML = res.text;
+		document.getElementById("Lat").innerHTML = res.lat;
+		document.getElementById("Lon").innerHTML = res.lon;
+		document.getElementById("Spd").innerHTML = res.speed;
 		
 
       };
 
   </script>
-<h1 id="Lat"></h1>
-<h1 id="Lon"></h1>
-<h1 id="Text"></h1>
 
-
-<table border="1" style="width:50%">
+<div id=tableBorder>
+<table border="1" >
 <tr>
-        <td><h1>Lattitude</h1></td><td><h1 id="TabLat"></h1></td>
+        <td id="latLable" class="lable"><h1>Lattitude</h1></td><td class="pos"><h1 id="Lat"></h1></td>
 </tr>
 <tr>
-          <td><h1>Longitude</h1></td><td><h1 id="TabLon"></h1></td>
+          <td id="lonLable" class="lable" ><h1>Longitude</h1></td><td class="pos"><h1 id="Lon"></h1></td>
 </tr>
 <tr>
-        <td><h1>Text</h1></td><td><h1 id="TabText"></h1></td>
+        <td id="speedLable" class="lable"><h1>SOG</h1></td><td class="pos"><h1 id="Spd"></h1></td>
 </tr>
 
 </tr>
 
 </table>
-
+</div>
 
 
 
