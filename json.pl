@@ -12,10 +12,10 @@ my $maximum = 9999;
 get '/' => 'index';
 
 websocket '/echo' => sub {
-  my $c = shift;
-  $c->app->log->debug('WebSocket opened');
+  my $ws = shift;
+  $ws->app->log->debug('WebSocket opened');
 
-  $c->inactivity_timeout(300);
+  $ws->inactivity_timeout(300);
 
   my $id = Mojo::IOLoop->recurring(1 => sub {
 
@@ -24,16 +24,15 @@ my $lon = $minimum + int(rand($maximum - $minimum));
 my $text = $minimum + int(rand($maximum - $minimum));
 
 my $bytes = encode_json {lat => $lat, lon => $lon, text => $text};
-$c->send($bytes);
- # $c->send($x);
-
+$ws->send($bytes);
+ 
  });
 
-   $c->on(finish => sub {
-    my ($c, $code, $reason) = @_;
-    $c->on(finish => sub { Mojo::IOLoop->remove($id) });
+   $ws->on(finish => sub {
+    my ($ws, $code, $reason) = @_;
+    $ws->on(finish => sub { Mojo::IOLoop->remove($id) });
 
-    $c->app->log->debug("WebSocket closed with status $code");
+    $ws->app->log->debug("WebSocket closed with status $code");
 
   });
 };
@@ -47,28 +46,16 @@ __DATA__
   <head><title>Web Socket Mojolicious</title></head>
   <body>
     <script>
-   //   var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
-   //   ws.onmessage = function(event) {
-   //     document.getElementById("dateTime").innerHTML = event.data;
-   //   };
   
- var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
- ws.onmessage = function(event) {
-	var res = JSON.parse(event.data);
-	 document.getElementById("Lat").innerHTML = res.lat;
-document.getElementById("Lon").innerHTML = res.lon;
-document.getElementById("Text").innerHTML = res.text;
-
-   //     document.getElementById("dateTime").innerHTML = event.data;
+ 	var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
+ 	ws.onmessage = function(event) {
+		var res = JSON.parse(event.data);
+		document.getElementById("Lat").innerHTML = res.lat;
+		document.getElementById("Lon").innerHTML = res.lon;
+		document.getElementById("Text").innerHTML = res.text;
       };
-  
-
-
-
-
 
   </script>
-
 <h1 id="Lat"></h1>
 <h1 id="Lon"></h1>
 <h1 id="Text"></h1>
